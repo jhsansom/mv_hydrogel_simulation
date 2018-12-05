@@ -31,6 +31,7 @@ class experiment ():
         # Inputs
         self.E = None
         self.nu = nu
+        self.mu = None
         self.initial_curvature = initial_curvature
         self.exp_data = self.import_experimental_data(exp_data_filename)
         self.length = length

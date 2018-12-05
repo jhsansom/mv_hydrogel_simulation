@@ -2,6 +2,8 @@
 ## of the physical experiment. 
 
 # import statements
+import matplotlib
+matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 from dolfin import *
 from mshr import *
@@ -15,8 +17,9 @@ def run_init_state(num):
     exp = open_experiment('./iteration%i/data.pkl'%num)
 
     # assign body force and E
-    body_force = exp.body_force
+    #body_force = exp.body_force
     E_assign = exp.E
+    exp.mu = exp.E/(2*(1 + exp.nu))
     nu_assigned = exp.nu
     initial_curvature = exp.initial_curvature
 
@@ -56,7 +59,6 @@ def run_init_state(num):
     vq = TestFunction(W)
 
     T  = Constant((0.0, 0.0, 0.0))  # Traction force on the boundary
-    #B  = Constant((0.0, -0.01, 0.0))  # Body force per unit volume
     # --> traction integral 
     integrals_N = [dot(T,u)*ds(1)] # just = 0 here 
 
@@ -77,7 +79,7 @@ def run_init_state(num):
 
         # calculate curvature
         up, dup, vq = get_functions()
-        up, dup, vq, f_int, f_ext = problem_solve(disp, up,dup,vq)
+        up, dup, vq, f_int, f_ext = problem_solve(disp, up,dup,vq, B)
         (u,p) = up.split(True)
         curve = get_curvature(u)
 
@@ -92,15 +94,14 @@ def run_init_state(num):
         print('DISP = ', disp)
         # displace mesh by given disp
         up, dup, vq = get_functions()
-        up, dup, vq, f_int, f_ext = problem_solve(disp, up,dup,vq)
+        up, dup, vq, f_int, f_ext = problem_solve(disp, up,dup,vq, B)
         (u,p) = up.split(True)
-        print('Hello')
 
         # calculate and return force
         return get_rxn_force(W, f_int, f_ext, disp)
 
     ##########################################################################################
-    def problem_solve(applied_disp, up,dup,vq):
+    def problem_solve(applied_disp, up,dup,vq, B):
         (u, p) = split(up)
         ######################################################################################
         # boundary conditions (inside solver because they change) 
@@ -137,7 +138,7 @@ def run_init_state(num):
         # set up eqn to solve and solve it   
         ######################################################################################
         f_int = derivative(psi*dx,up,vq)
-        f_ext = derivative( dot(B, u)*dx + sum(integrals_N) , up, vq)
+        f_ext = derivative(dot(B, u)*dx + sum(integrals_N) , up, vq)
         F = f_int - f_ext 
         # Tangent 
         dF = derivative(F, up, dup)
@@ -225,7 +226,7 @@ def run_init_state(num):
         plt.scatter(x,y)
         plt.xlabel('X - Coordinate')
         plt.ylabel('Y - Coordinate')
-        plt.savefig('./iteration%i/nodes.png'%(num))
+        plt.savefig('./iteration%i/nodes'%(num))
 
         graph_prime = np.poly1d.deriv(y2)
         y3 = np.poly1d(graph_prime)

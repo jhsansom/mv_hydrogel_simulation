@@ -2,6 +2,8 @@
 ## It also imports init_state.py, which calculates the intial body force to use
 
 # Other import statements
+import matplotlib
+matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 from dolfin import *
 from mshr import *
