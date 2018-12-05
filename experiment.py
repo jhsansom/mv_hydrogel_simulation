@@ -51,7 +51,7 @@ class experiment ():
         self.rsquared = None
 
     def import_experimental_data(self, exp_data_filename):
-        return np.array(pd.read_excel(exp_data_filename))
+        return np.transpose(np.array(pd.read_excel(exp_data_filename)))
     
 
 

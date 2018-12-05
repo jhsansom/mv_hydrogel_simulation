@@ -23,7 +23,7 @@ def calculate_error(E):
     print('\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\n')
 
     # Run experiment
-    post_proc.run_post_proc(num)
+    post_proc.run_post_proc(num, True)
 
     # Import back in experiment
     exp = open_experiment('./iteration%i/data.pkl'%num)

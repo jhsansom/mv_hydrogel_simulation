@@ -9,8 +9,9 @@ import numpy as np
 from experiment import *
 import init_state
 
-def run_sim(num):
-	init_state.run_init_state(num)
+def run_sim(num, run_init):
+	if run_init:
+		init_state.run_init_state(num)
 
 	# Imports experimental data
 	exp = open_experiment('./iteration%i/data.pkl'%num)

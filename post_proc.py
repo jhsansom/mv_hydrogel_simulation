@@ -9,9 +9,10 @@ import pandas as pd
 from experiment import *
 import sim
 
-def run_post_proc (num):
+def run_post_proc (num, run_sim):
     # Runs sim module
-    sim.run_sim(num)
+    if run_sim:
+        sim.run_sim(num, True)
 
     # Imports experimental data
     exp = open_experiment('./iteration%i/data.pkl'%num)
@@ -21,6 +22,7 @@ def run_post_proc (num):
     nu_assigned = exp.nu
     exp_data = exp.exp_data
 
+    
     i = 0
     while i < len(exp_data):
         if exp_data[i,0] > 3:
@@ -32,8 +34,7 @@ def run_post_proc (num):
     sim_force = exp.force_array
     sim_disp = exp.u_array
 
-    x_lo = -6; x_hi = 6; y_lo = -0.59; y_hi = 0.59; z_lo = -2.86; z_hi = 2.86
-
+    x_lo = -exp.length/2; x_hi = exp.length/2; y_lo = -exp.height/2; y_hi = exp.height/2; z_lo = -exp.width/2; z_hi = exp.width/2
 
     def get_mi(P,y):
         b = (z_hi - z_lo)
@@ -69,18 +70,20 @@ def run_post_proc (num):
         
     mi_list = []; c_list = [] 
 
+    
     num_step = sim_force.shape[0]
-
+    
+    
     plt.figure()
     for kk in range(0,num_step):
         P = sim_force[kk,0]
         y = sim_disp[kk,7]*(-1)
         mi_list.append(get_mi(P,y) )
         c_list.append(get_curvature(sim_disp[kk,:]))
-
+    
     plt.axis('equal')
     plt.savefig('./iteration%i/curves'%(num))
-
+    
     plt.figure()
     plt.plot(c_list,mi_list)
     plt.savefig('./iteration%i/graph_curve'%(num))
@@ -105,23 +108,28 @@ def run_post_proc (num):
     # Finds residuals and error
     sim_func = interpolate.interp1d(applied_disp, mi_list, fill_value='extrapolate')
     residuals = np.zeros(len(applied_disp))
-    for i in range(len(mi_list)):
-        residuals[i] = exp_data[i,1] - sim_func(exp_data[i,0])
-    slope, intercept, r_value, p_value, std_err = stats.linregress(applied_disp, residuals)
-    exp.rsquared = r_value ** 2
+    esiduals = np.array([])
+    for i in range(len(exp_data[0,:])):
+        residuals = np.append(residuals, exp_data[1,i] - sim_func(exp_data[0,i]))
     exp.error = np.dot(residuals, residuals)
     exp.residuals = residuals
 
+    # Finds R^2 value
+    avg = sum(exp_data[1,:]) / len(exp_data[1,:])
+    norm_array = exp_data[1,:] - avg
+    sstot = np.dot(norm_array, norm_array)
+    exp.rsquared = 1 - (exp.error / sstot)
+    exp.mu = E_assign / (2*(1 + nu_assigned))
+    
     save_experiment('./iteration%i/data.pkl'%num, exp)
 
     # Graphs moment displacement curve
-    mu = E_assign / (2*(1 + nu_assigned))
     plt.scatter(exp_data[:,0],exp_data[:,1], c='r', s=10)
     #plt.plot(applied_disp,mi_list, 'k')
     plt.plot(applied_disp, sim_func(applied_disp), 'k')
     plt.ylabel('M/I (mN*mm^-3)')
     plt.xlabel('Displacement (mm)')
-    plt.title('Moment-Displacement Curve @ mu = ' + str(mu))
+    plt.title('Moment-Displacement Curve @ mu = ' + str(exp.mu))
     plt.savefig('./iteration%i/graph_disp'%(num))
 
     # Graphs residuals
@@ -131,5 +139,4 @@ def run_post_proc (num):
     plt.xlabel('Displacement (mm)')
     plt.title('Moment-Displacement Residuals @ mu = ' + str(mu))
     plt.savefig('./iteration%i/graph_disp_norm'%(num))
-
 
