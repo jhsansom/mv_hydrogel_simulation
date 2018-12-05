@@ -67,8 +67,9 @@ def run_init_state(num):
     def get_functions():
         return up, dup, vq
 
+    B = Constant((0.0, 0.0, 0.0))
     def f1(body_force):
-        global B  
+        global B
         B = Constant((0.0, -body_force, 0.0))  # Body force per unit volume
         print('BODY FORCE = ', body_force)
         # optimize displacement for given body force using newton solver
@@ -93,6 +94,7 @@ def run_init_state(num):
         up, dup, vq = get_functions()
         up, dup, vq, f_int, f_ext = problem_solve(disp, up,dup,vq)
         (u,p) = up.split(True)
+        print('Hello')
 
         # calculate and return force
         return get_rxn_force(W, f_int, f_ext, disp)
