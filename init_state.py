@@ -76,7 +76,7 @@ def run_init_state(num):
 
         # calculate curvature
         up, dup, vq = get_functions()
-        up, dup, vq, f_int, f_ext = problem_solve(disp, up,dup,vq)
+        up, dup, vq, f_int, f_ext = problem_solve(disp, up,dup,vq, B)
         (u,p) = up.split(True)
         curve = get_curvature(u)
 
@@ -91,7 +91,7 @@ def run_init_state(num):
         print('DISP = ', disp)
         # displace mesh by given disp
         up, dup, vq = get_functions()
-        up, dup, vq, f_int, f_ext = problem_solve(disp, up,dup,vq)
+        up, dup, vq, f_int, f_ext = problem_solve(disp, up,dup,vq, B)
         (u,p) = up.split(True)
 
         # calculate and return force
