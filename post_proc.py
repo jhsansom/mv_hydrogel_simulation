@@ -4,6 +4,8 @@
 # Other import statements
 from scipy import stats, interpolate
 import numpy as np
+import matplotlib
+matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 import pandas as pd
 from experiment import *
@@ -21,15 +23,14 @@ def run_post_proc (num, run_sim):
     E_assign = exp.E
     nu_assigned = exp.nu
     exp_data = exp.exp_data
-
     
     i = 0
-    while i < len(exp_data):
-        if exp_data[i,0] > 3:
+    while i < len(exp_data[0,:]):
+        if exp_data[0,i] > 3:
             break
         i += 1
 
-    exp_data = exp_data[0:i-1,:]
+    exp_data = exp_data[:,0:i-1]
 
     sim_force = exp.force_array
     sim_disp = exp.u_array
@@ -107,8 +108,7 @@ def run_post_proc (num, run_sim):
 
     # Finds residuals and error
     sim_func = interpolate.interp1d(applied_disp, mi_list, fill_value='extrapolate')
-    residuals = np.zeros(len(applied_disp))
-    esiduals = np.array([])
+    residuals = np.array([])
     for i in range(len(exp_data[0,:])):
         residuals = np.append(residuals, exp_data[1,i] - sim_func(exp_data[0,i]))
     exp.error = np.dot(residuals, residuals)
@@ -124,8 +124,7 @@ def run_post_proc (num, run_sim):
     save_experiment('./iteration%i/data.pkl'%num, exp)
 
     # Graphs moment displacement curve
-    plt.scatter(exp_data[:,0],exp_data[:,1], c='r', s=10)
-    #plt.plot(applied_disp,mi_list, 'k')
+    plt.scatter(exp_data[0,:],exp_data[1,:], c='r', s=10)
     plt.plot(applied_disp, sim_func(applied_disp), 'k')
     plt.ylabel('M/I (mN*mm^-3)')
     plt.xlabel('Displacement (mm)')
@@ -134,9 +133,10 @@ def run_post_proc (num, run_sim):
 
     # Graphs residuals
     plt.clf()
-    plt.scatter(applied_disp,residuals, c='r', s=10)
+    plt.plot(exp_data[0,:], np.zeros(len(exp_data[0,:])), c='k')
+    plt.scatter(exp_data[0,:],residuals, c='r', s=10)
     plt.ylabel('M/I (mN*mm^-3)')
     plt.xlabel('Displacement (mm)')
-    plt.title('Moment-Displacement Residuals @ mu = ' + str(mu))
+    plt.title('Moment-Displacement Residuals @ mu = ' + str(exp.mu))
     plt.savefig('./iteration%i/graph_disp_norm'%(num))
 
