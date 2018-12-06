@@ -75,11 +75,12 @@ def run_init_state(num):
         B = Constant((0.0, -body_force, 0.0))  # Body force per unit volume
         print('BODY FORCE = ', body_force)
         # optimize displacement for given body force using newton solver
-        disp = optimize.newton(f2, 0.0)
+        global ideal_disp
+        ideal_disp = optimize.newton(f2, 0.0)
 
         # calculate curvature
         up, dup, vq = get_functions()
-        up, dup, vq, f_int, f_ext = problem_solve(disp, up,dup,vq, B)
+        up, dup, vq, f_int, f_ext = problem_solve(ideal_disp, up,dup,vq, B)
         (u,p) = up.split(True)
         curve = get_curvature(u)
 
@@ -89,8 +90,6 @@ def run_init_state(num):
 
     ideal_disp = 0.0
     def f2(disp):
-        global ideal_disp
-        ideal_disp = disp
         print('DISP = ', disp)
         # displace mesh by given disp
         up, dup, vq = get_functions()
@@ -246,3 +245,6 @@ def run_init_state(num):
     exp.body_force = optimize.newton(f1, 0.0001)
     exp.ideal_disp = ideal_disp
     save_experiment('./iteration%i/data.pkl'%num, exp)
+
+    print('IDEAL BODY FORCE = ', exp.body_force)
+    print('IDEAL DISPLACEMENT = ', exp.ideal_disp)

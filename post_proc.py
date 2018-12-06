@@ -41,7 +41,7 @@ def run_post_proc (num, run_sim):
         b = (z_hi - z_lo)
         h = (y_hi - y_lo)
         I = b * h ** 3.0 / 12.0
-        M = P * y 
+        M = P * y
         M_over_I = M / I
         return abs(M_over_I)
 
@@ -65,21 +65,20 @@ def run_post_proc (num, run_sim):
         curvature = ypp0/( 1.0 + yp0**2.0  )**(3.0/2.0)
         plt.plot(x,y,'-o')
         plt.plot(x,pfit(x),'--*')
-        
-        
+
         return curvature
         
     mi_list = []; c_list = [] 
 
-    
     num_step = sim_force.shape[0]
     
     
     plt.figure()
     for kk in range(0,num_step):
         P = sim_force[kk,0]
-        y = sim_disp[kk,7]*(-1)
-        mi_list.append(get_mi(P,y) )
+        y = sim_disp[kk,7]
+        #mi_list.append(get_mi(P,y))
+        mi_list.append(P*y)
         c_list.append(get_curvature(sim_disp[kk,:]))
     
     plt.axis('equal')
@@ -90,6 +89,8 @@ def run_post_proc (num, run_sim):
     plt.savefig('./iteration%i/graph_curve'%(num))
 
     plt.figure()
+    print(exp.disp_list)
+    print(ideal_disp)
     applied_disp_list = exp.disp_list + ideal_disp*np.ones((len(exp.disp_list)))
     applied_disp  = [] 
     for kk in range(0,len(applied_disp_list)):

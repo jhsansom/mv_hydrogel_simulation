@@ -9,9 +9,9 @@ import os
 
 # Input parameters
 nu = 0.499
-length = 10.0
-width = 5.0
-height = 1.0
+length = 11.78
+width = 5.5
+height = 1.1
 initial_curvature = 0.021
 exp_data_filename = 'data.xlsx'
 
