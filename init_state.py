@@ -96,7 +96,6 @@ def run_init_state(num):
 
     ##########################################################################################
     def problem_solve(applied_disp, up,dup,vq, body_force):
-        print('MY GODDAMNED BODY FORCE = ', body_force)
         B = Constant((0.0, -body_force, 0.0))
         (u, p) = split(up)
         ######################################################################################
