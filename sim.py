@@ -187,7 +187,8 @@ def run_sim(num, run_init):
 	##########################################################################################
 	fname_paraview = File("./iteration%i/disp.pvd"%(num))
 
-	disp_list = np.arange(0.0, -3.0, -0.05)
+	disp_list = np.linspace(exp.ideal_disp, )
+	disp_list = np.arange(exp.ideal_disp, -3.4, -0.05)
 	step_num = 0
 	for kk in range(0,len(disp_list)):
 		applied_disp = disp_list[kk]

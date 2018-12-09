@@ -80,6 +80,7 @@ def run_post_proc (num, run_sim):
         #mi_list.append(get_mi(P,y))
         mi_list.append(P*y)
         c_list.append(get_curvature(sim_disp[kk,:]))
+        print(P*y)
     
     plt.axis('equal')
     plt.savefig('./iteration%i/curves'%(num))
@@ -91,7 +92,7 @@ def run_post_proc (num, run_sim):
     plt.figure()
     print(exp.disp_list)
     print(ideal_disp)
-    applied_disp_list = exp.disp_list + ideal_disp*np.ones((len(exp.disp_list)))
+    applied_disp_list = exp.disp_list - ideal_disp*np.ones((len(exp.disp_list)))
     applied_disp  = [] 
     for kk in range(0,len(applied_disp_list)):
         applied_disp.append(-1*applied_disp_list[kk])

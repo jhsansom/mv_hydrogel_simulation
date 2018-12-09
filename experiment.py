@@ -12,7 +12,7 @@ nu = 0.499
 length = 11.78
 width = 5.5
 height = 1.1
-initial_curvature = 0.021
+initial_curvature = 0.070037
 exp_data_filename = 'data.xlsx'
 
 def save_experiment(filename, obj):

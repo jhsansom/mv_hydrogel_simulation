@@ -69,18 +69,24 @@ def run_init_state(num):
     def get_functions():
         return up, dup, vq
 
-    B = Constant((0.0, 0.0, 0.0))
     def f1(body_force):
-        global B
-        B = Constant((0.0, -body_force, 0.0))  # Body force per unit volume
+        def f2(disp):
+            print('DISP = ', disp)
+            # displace mesh by given disp
+            up, dup, vq = get_functions()
+            up, dup, vq, f_int, f_ext = problem_solve(disp, up,dup,vq, body_force)
+            (u,p) = up.split(True)
+
+            # calculate and return force
+            return get_rxn_force(W, f_int, f_ext, disp)
+
         print('BODY FORCE = ', body_force)
         # optimize displacement for given body force using newton solver
-        global ideal_disp
-        ideal_disp = optimize.newton(f2, 0.0)
+        exp.ideal_disp = optimize.newton(f2, 0.0)
 
         # calculate curvature
         up, dup, vq = get_functions()
-        up, dup, vq, f_int, f_ext = problem_solve(ideal_disp, up,dup,vq, B)
+        up, dup, vq, f_int, f_ext = problem_solve(exp.ideal_disp, up,dup,vq, body_force)
         (u,p) = up.split(True)
         curve = get_curvature(u)
 
@@ -88,19 +94,10 @@ def run_init_state(num):
         print('CURVATURE = ', curve)
         return curve - initial_curvature
 
-    ideal_disp = 0.0
-    def f2(disp):
-        print('DISP = ', disp)
-        # displace mesh by given disp
-        up, dup, vq = get_functions()
-        up, dup, vq, f_int, f_ext = problem_solve(disp, up,dup,vq, B)
-        (u,p) = up.split(True)
-
-        # calculate and return force
-        return get_rxn_force(W, f_int, f_ext, disp)
-
     ##########################################################################################
-    def problem_solve(applied_disp, up,dup,vq, B):
+    def problem_solve(applied_disp, up,dup,vq, body_force):
+        print('MY GODDAMNED BODY FORCE = ', body_force)
+        B = Constant((0.0, -body_force, 0.0))
         (u, p) = split(up)
         ######################################################################################
         # boundary conditions (inside solver because they change) 
@@ -243,7 +240,7 @@ def run_init_state(num):
     ####################################################
 
     exp.body_force = optimize.newton(f1, 0.0001)
-    exp.ideal_disp = ideal_disp
+
     save_experiment('./iteration%i/data.pkl'%num, exp)
 
     print('IDEAL BODY FORCE = ', exp.body_force)
