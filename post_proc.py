@@ -127,7 +127,7 @@ def run_post_proc (num, run_sim):
     plt.plot(applied_disp, sim_func(applied_disp), 'k')
     plt.ylabel('M/I (mN*mm^-3)')
     plt.xlabel('Displacement (mm)')
-    plt.title('Moment-Displacement Curve @ mu = ' + str(exp.mu))
+    plt.title('Moment-Displacement Curve @ mu = %.5f'%exp.mu)
     plt.savefig('./iteration%i/graph_disp'%(num))
 
     # Graphs residuals
@@ -136,6 +136,6 @@ def run_post_proc (num, run_sim):
     plt.scatter(exp_data[0,:],residuals, c='r', s=10)
     plt.ylabel('M/I (mN*mm^-3)')
     plt.xlabel('Displacement (mm)')
-    plt.title('Moment-Displacement Residuals @ mu = ' + str(exp.mu))
+    plt.title('Moment-Displacement Residuals @ mu = %.5f'%exp.mu)
     plt.savefig('./iteration%i/graph_disp_norm'%(num))
 
