@@ -14,6 +14,7 @@ width = 5.5
 height = 1.1
 initial_curvature = 0.070037
 exp_data_filename = 'data.xlsx'
+is_raw_data = True
 
 def save_experiment(filename, obj):
     with open(filename, 'wb') as file:
@@ -52,8 +53,13 @@ class experiment ():
         self.rsquared = None
 
     def import_experimental_data(self, exp_data_filename):
-        return np.transpose(np.array(pd.read_excel(exp_data_filename)))
-    
+        if is_raw_data:
+            raw_data = np.array(pd.read_excel(exp_data_filename))
+            disp_array = raw_data[:,3] - raw_data[:,9]
+            disp_array = disp_array - np.ones(len(disp_array))*disp_array[0]
 
+            moment_array = raw_data[:,43]
 
-
+            return np.vstack((disp_array, moment_array))
+        else:
+            return np.transpose(np.array(pd.read_excel(exp_data_filename)))
